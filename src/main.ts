@@ -7,7 +7,7 @@ app.use(express.json())
 app.use(cors())
 
 
-app.get("/produtos", async (req, res) => {
+app.get("/livros", async (req, res) => {
     try {
         const connection = await mysql.createConnection({
             host: process.env.dbhost ? process.env.dbhost : "localhost",
@@ -16,16 +16,14 @@ app.get("/produtos", async (req, res) => {
             database: process.env.dbname ? process.env.dbname : "banco1022a",
             port: process.env.dbport ? parseInt(process.env.dbport) : 3306
         })
-        const [result, fields] = await connection.query("SELECT * from produtos")
+        const [result, fields] = await connection.query("SELECT * from livros")
         await connection.end()
         res.send(result)
     } catch (e) {
         res.status(500).send("Server ERROR")
     }
 })
-
-
-app.get("/usuarios", async (req, res) => {
+app.post("/livros", async (req, res) => {
     try {
         const connection = await mysql.createConnection({
             host: process.env.dbhost ? process.env.dbhost : "localhost",
@@ -34,13 +32,19 @@ app.get("/usuarios", async (req, res) => {
             database: process.env.dbname ? process.env.dbname : "banco1022a",
             port: process.env.dbport ? parseInt(process.env.dbport) : 3306
         })
-        const [result, fields] = await connection.query("SELECT * from usuarios")
+        const {id,nome,descricao,preco,imagem} = req.body
+        const [result, fields] = 
+                    await connection.query("INSERT INTO livros VALUES (?,?,?,?,?)",
+                            [id,nome,descricao,preco,imagem])
         await connection.end()
-        res.send(result)
+        res.status(201).send(result)
     } catch (e) {
+        console.log(e)
         res.status(500).send("Server ERROR")
     }
 })
+
+
 
 app.listen(8000, () => {
     console.log("Iniciei o servidor")
