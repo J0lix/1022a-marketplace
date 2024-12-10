@@ -40,16 +40,18 @@ app.get("/livros", async (req, res) => {
 app.post("/livros", async (req, res) => {
     try {
         const connection = await createDbConnection();
-        const { id, titulo, autor, preco, imagem, categoria_id } = req.body;
+        const { id, titulo, autor, preco, imagem, categoria_id, descricao } = req.body; // Adicione 'descricao'
 
-        if (!id || !titulo || !autor || !preco || !imagem || !categoria_id) {
+        // Validação dos campos obrigatórios
+        if (!id || !titulo || !autor || !preco || !imagem || !categoria_id || !descricao) {
             return res.status(400).send("Todos os campos são obrigatórios.");
         }
 
         const [result] = await connection.query(
-            'INSERT INTO livros (id, titulo, autor, preco, imagem, categoria_id) VALUES (?, ?, ?, ?, ?, ?)', 
-            [id, titulo, autor, preco, imagem, categoria_id]
+            'INSERT INTO livros (id, titulo, autor, preco, imagem, categoria_id, descricao) VALUES (?, ?, ?, ?, ?, ?, ?)', 
+            [id, titulo, autor, preco, imagem, categoria_id, descricao] // Inclua 'descricao' aqui
         );
+
         await connection.end();
 
         res.status(201).send({ message: "Livro cadastrado com sucesso!", result });
